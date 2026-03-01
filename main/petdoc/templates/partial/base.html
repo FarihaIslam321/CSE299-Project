@@ -28,6 +28,7 @@
 
  <style>
 
+
   
 /* Add smooth hover effect and vibrant background for the dropdown */
 .dropdown-menu {
@@ -233,6 +234,27 @@ footer .footer-about .social-links a:hover {
   <!-- Main JS File -->
   <script src="{% static 'js/main.js' %}"></script>
 
+  <script>
+  let lastScrollTop = 0; // Keep track of last scroll position
+  const header = document.querySelector('.header'); // Get the header element
+
+  window.addEventListener('scroll', function() {
+    let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    // If the user is scrolling down, hide the header
+    if (currentScroll > lastScrollTop) {
+      header.style.top = "-80px"; // Adjust this value based on the height of your header
+    } else {
+      // If the user is scrolling up, show the header
+      header.style.top = "0";
+    }
+
+    // Update the last scroll position
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // Prevent negative scroll values
+  });
+</script>
+
 </body>
 
 </html>
+

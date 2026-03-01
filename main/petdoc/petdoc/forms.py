@@ -1,29 +1,36 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
-class RegistrationForm(forms.Form):
-    full_name = forms.CharField(max_length=255, required=True)
-    email = forms.EmailField(required=True)
-    password = forms.CharField(widget=forms.PasswordInput, required=True, min_length=8)
-    confirm_password = forms.CharField(widget=forms.PasswordInput, required=True, min_length=8)
-    country = forms.ChoiceField(choices=[('us', 'United States'), ('ca', 'Canada'), ('uk', 'United Kingdom'), 
-                                        ('au', 'Australia'), ('de', 'Germany'), ('fr', 'France'), 
-                                        ('jp', 'Japan'), ('other', 'Other')], required=True)
-    terms_check = forms.BooleanField(required=True)
-    marketing_check = forms.BooleanField(required=False)
+class RegisterForm(forms.ModelForm):
+    fullName = forms.CharField(max_length=100)
+    password = forms.CharField(widget=forms.PasswordInput)
+    confirmPassword = forms.CharField(widget=forms.PasswordInput)
+    country = forms.CharField(required=True)
+    marketingCheck = forms.BooleanField(required=False)
+    termsCheck = forms.BooleanField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['fullName', 'email', 'password']
 
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("confirm_password")
-        
-        if password != confirm_password:
-            raise ValidationError("Passwords do not match.")
-        
-        # Ensure the email is unique
-        email = cleaned_data.get("email")
-        if User.objects.filter(email=email).exists():
-            raise ValidationError("Email is already registered.")
-        
+        confirm = cleaned_data.get("confirmPassword")
+
+        if password != confirm:
+            raise ValidationError("Passwords do not match")
+
         return cleaned_data
+
+    def save(self, commit=True):
+        user = User(
+            username=self.cleaned_data['fullName'],
+            email=self.cleaned_data['email'],
+            
+        )
+        user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+        return user

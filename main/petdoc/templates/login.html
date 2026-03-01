@@ -4,8 +4,6 @@
 
 <main class="main">
 
-  
-
   <!-- Login Section -->
   <section id="login" class="login section">
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -38,16 +36,16 @@
                   <span class="input-icon">
                     <i class="bi bi-envelope"></i>
                   </span>
-                  <input type="email" name="email" class="form-control" placeholder="Email address" required autocomplete="email">
+                  <input type="email" name="email" class="form-control" placeholder="Email address" required autocomplete="email" id="email">
                 </div>
 
                 <div class="input-group mb-3">
                   <span class="input-icon">
                     <i class="bi bi-lock"></i>
                   </span>
-                  <input type="password" name="password" class="form-control" placeholder="Password" required autocomplete="current-password">
-                  <span class="password-toggle">
-                    <i class="bi bi-eye"></i>
+                  <input type="password" name="password" class="form-control" placeholder="Password" required autocomplete="current-password" id="password">
+                  <span class="password-toggle" onclick="togglePassword()">
+                    <i class="bi bi-eye" id="password-toggle-icon"></i>
                   </span>
                 </div>
 
@@ -90,3 +88,21 @@
 </main>
 
 {% endblock content %}
+
+<script>
+  // Function to toggle password visibility
+  function togglePassword() {
+    const passwordField = document.getElementById('password');
+    const passwordToggleIcon = document.getElementById('password-toggle-icon');
+
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+      passwordToggleIcon.classList.remove("bi-eye");
+      passwordToggleIcon.classList.add("bi-eye-slash");
+    } else {
+      passwordField.type = "password";
+      passwordToggleIcon.classList.remove("bi-eye-slash");
+      passwordToggleIcon.classList.add("bi-eye");
+    }
+  }
+</script>

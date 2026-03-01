@@ -5,20 +5,7 @@
 
 <style>
   /* Fixed Header */
-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Set background color of header */
-    z-index: 1000; /* Ensure the header stays on top */
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
+
 
 /* Account Dropdown on Right */
 .account-dropdown {
@@ -98,7 +85,7 @@ header {
     {% if user.is_authenticated %}
       <!-- LOGGED-IN VIEW -->
       <div class="dropdown-header">
-        <h6 class="text-primary">Hello, {{ user.username }}</h6>
+        <h6 class="text-primary">Hello, {{ user.first_name }}</h6>
       </div>
 
       <div class="dropdown-body">
@@ -111,7 +98,7 @@ header {
       </div>
 
       <div class="dropdown-footer">
-        <form method="POST" action=# >
+        <form method="POST" action="{% url 'logout' %}" >
           {% csrf_token %}
           <button class="btn btn-danger w-100">Logout</button>
         </form>
