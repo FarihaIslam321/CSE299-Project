@@ -26,7 +26,9 @@
   <!-- Main CSS File -->
   <link href="{% static 'css/main.css' %}" rel="stylesheet">
 
-<style>
+ <style>
+
+  
 /* Add smooth hover effect and vibrant background for the dropdown */
 .dropdown-menu {
   border-radius: 8px;
@@ -150,7 +152,7 @@ footer .footer-about .social-links a:hover {
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="{% url 'home' %}" class="active">Home</a></li>
           <li><a href="departments.html">Shop</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -160,48 +162,7 @@ footer .footer-about .social-links a:hover {
 
     </div>
 
-<!-- Account Dropdown -->
-<div class="dropdown account-dropdown">
-  <button class="header-action-btn" data-bs-toggle="dropdown">
-    <i class="bi bi-person"></i>
-  </button>
 
-  <div class="dropdown-menu dropdown-menu-left">
-    {% if user.is_authenticated %}
-      <!-- LOGGED-IN VIEW -->
-      <div class="dropdown-header">
-        <h6 class="text-primary">Hello, {{ user.username }}</h6>
-      </div>
-
-      <div class="dropdown-body">
-        <a class="dropdown-item" href=# >
-          <i class="bi bi-person-circle me-2"></i> My Profile
-        </a>
-        <a class="dropdown-item" href=# >
-          <i class="bi bi-gear me-2"></i> Settings
-        </a>
-      </div>
-
-      <div class="dropdown-footer">
-        <form method="POST" action=# >
-          {% csrf_token %}
-          <button class="btn btn-danger w-100">Logout</button>
-        </form>
-      </div>
-
-    {% else %}
-      <!-- GUEST VIEW -->
-      <div class="dropdown-header">
-        <h6>Welcome to Petdoc</h6>
-      </div>
-
-      <div class="dropdown-footer">
-        <a href="#" class="btn btn-primary w-100 mb-2">Sign In</a>
-        <a href="#" class="btn btn-outline-primary w-100">Create Account</a>
-      </div>
-    {% endif %}
-  </div>
-</div>
   </header>
 
   {% block content %}
