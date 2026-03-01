@@ -150,7 +150,7 @@ JAZZMIN_SETTINGS = {
     "site_brand": "Medi_care",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "img/petdoc.png",
+    "site_logo": "img/petdoc.jpg",
 
 
     # Welcome text on the login screen

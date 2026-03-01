@@ -124,8 +124,8 @@ header {
       </div>
 
       <div class="dropdown-footer">
-        <a href="#" class="btn btn-primary w-100 mb-2">Sign In</a>
-        <a href="#" class="btn btn-outline-primary w-100">Create Account</a>
+        <a href="{% url 'login' %}" class="btn btn-primary w-100 mb-2">Sign In</a>
+        <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">Create Account</a>
       </div>
     {% endif %}
   </div>
