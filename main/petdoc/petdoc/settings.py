@@ -19,8 +19,6 @@ MESSAGE_TAGS = {
 }
 
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-)(2!%)q(ay8c+-6acyje8)8p6doc1vsa46haj@yt7d7$no^nc5"
+SECRET_KEY = "django-insecure-zi)3-2p^^+aq07er8%27+-_%o2v=$fvu@b6##a0c5l)c*no)22"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,6 +45,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    #cutom app
+    "core",
+    "userauths",
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [
@@ -64,10 +66,11 @@ ROOT_URLCONF = "petdoc.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  
-        "APP_DIRS": True,  
+        "DIRS": [os.path.join(BASE_DIR,'templates')],
+        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "core.context_processors.cart_item_count",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -75,6 +78,7 @@ TEMPLATES = [
         },
     },
 ]
+
 WSGI_APPLICATION = "petdoc.wsgi.application"
 
 
@@ -139,6 +143,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "Admin",
@@ -161,3 +166,9 @@ JAZZMIN_SETTINGS = {
 
    
 }
+
+AUTH_USER_MODEL = 'userauths.User'
+LOGIN_URL = '/login/'
+
+SESSION_COOKIE_NAME = "user_session"
+SESSION_COOKIE_PATH = "/"
