@@ -1,0 +1,33 @@
+{% extends "partial/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container py-5">
+  <h2>Add Review</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="mb-3">
+      <label class="form-label">Product</label>
+      {{ form.product|add_class:"form-control" }}
+      {{ form.product.errors }}
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Rating (1-5)</label>
+      {{ form.rating|add_class:"form-control" }}
+      {{ form.rating.errors }}
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Comment</label>
+      {{ form.comment|add_class:"form-control" }}
+      {{ form.comment.errors }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+  </form>
+</div>
+{% endblock content %}

@@ -13,3 +13,16 @@ from core.models import (
 
 def home(request):
     return render(request, 'index.html')
+
+
+
+def product_details(request, id):
+    product = get_object_or_404(
+        Product.objects.annotate(
+            avg_rating=Avg("reviews__rating"),
+            review_count=Count("reviews")
+        ),
+        id=id
+    )
+
+    return render(request, "product-details.html", {"product": product})

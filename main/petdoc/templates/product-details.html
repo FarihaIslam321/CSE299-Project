@@ -1,0 +1,183 @@
+{% extends "partial/base.html" %}
+{% load static %}
+{% block content %}
+<main class="main">
+
+  <div class="page-title light-background">
+    <div class="container d-lg-flex justify-content-between align-items-center">
+      <h1 class="mb-2 mb-lg-0">Product Details</h1>
+      <nav class="breadcrumbs">
+        <ol>
+          <li><a href="{% url 'home' %}">Home</a></li>
+          <li class="current">{{ product.title }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <section id="product-details" class="product-details section">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="row g-4">
+        
+        <!-- Product Images -->
+        <div class="col-lg-7" data-aos="zoom-in" data-aos-delay="150">
+          <div class="product-gallery">
+
+            <div class="main-showcase">
+              <div class="image-zoom-container">
+                <img src="{{ product.image.url }}" alt="{{ product.title }}" 
+                     class="img-fluid main-product-image drift-zoom"
+                     id="main-product-image" data-zoom="{{ product.image.url }}">
+
+                <div class="image-navigation">
+                  <button class="nav-arrow prev-image image-nav-btn prev-image" type="button">
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                  <button class="nav-arrow next-image image-nav-btn next-image" type="button">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Thumbnails (if product has gallery images) -->
+            <div class="thumbnail-grid">
+              <div class="thumbnail-wrapper thumbnail-item active" data-image="{{ product.image.url }}">
+                <img src="{{ product.image.url }}" class="img-fluid">
+              </div>
+
+              {% for img in product.gallery.all %}
+              <div class="thumbnail-wrapper thumbnail-item" data-image="{{ img.image.url }}">
+                <img src="{{ img.image.url }}" class="img-fluid">
+              </div>
+              {% endfor %}
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-5" data-aos="fade-left" data-aos-delay="200">
+          <div class="product-details">
+
+            <div class="product-badge-container">
+              <span class="badge-category">{{ product.category.name }}</span>
+            </div>
+
+            <h1 class="product-name">{{ product.title }}</h1>
+
+            <div class="pricing-section">
+              <div class="price-display">
+                <span class="sale-price">৳{{ product.price }}</span>
+
+                {% if product.old_price %}
+                <span class="regular-price">৳{{ product.old_price }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="product-description" style="white-space: pre-wrap;">
+              <p>{{ product.description|safe }}</p>
+            </div>
+
+            <div class="availability-status">
+              {% if product.stock > 0 %}
+              <div class="stock-indicator">
+                <i class="bi bi-check-circle-fill"></i>
+                <span class="stock-text">In Stock</span>
+              </div>
+              <div class="quantity-left">Only {{ product.stock }} items left</div>
+              {% else %}
+              <div class="stock-indicator">
+                <i class="bi bi-x-circle-fill"></i>
+                <span class="stock-text text-danger">Out of Stock</span>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Buy Section -->
+                          
+                  <div class="purchase-section">
+
+                    <form action="{% url 'add_to_cart' product.id %}" method="POST">
+                      {% csrf_token %}
+
+                      <div class="quantity-control">
+                        <label class="control-label">Quantity:</label>
+                        <div class="quantity-input-group">
+                          <div class="quantity-selector">
+                            <button class="quantity-btn decrease" type="button"><i class="bi bi-dash"></i></button>
+
+                            <input type="number"
+                                  name="quantity"
+                                  class="quantity-input"
+                                  value="1"
+                                  min="1"
+                                  max="{{ product.stock }}">
+
+                            <button class="quantity-btn increase" type="button"><i class="bi bi-plus"></i></button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="action-buttons">
+                        <button class="btn primary-action" type="submit">
+                          <i class="bi bi-bag-plus"></i> Add to Cart
+                        </button>
+
+                        <button class="btn secondary-action" formaction="{% url 'buy_now' product.id %}" formmethod="POST" type ="submit">
+                          {% csrf_token %}
+                          <input type="hidden" name="quantity" value="{{ selected_quantity|default:1 }}">
+                          <i class="bi bi-lightning"></i> Buy Now
+                        </button>
+
+                        <button class="btn icon-action" type="button">
+                          <i class="bi bi-heart"></i>
+                        </button>
+                      </div>
+
+                    </form>
+
+                  </div>
+
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="row mt-5" data-aos="fade-up" data-aos-delay="300">
+        <div class="col-12">
+          <h3>Customer Reviews ({{ product.reviews.count }})</h3>
+
+          <div class="customer-reviews-list">
+            {% for review in product.reviews.all %}
+            <div class="review-card">
+
+              <h5 class="review-headline">{{ review.title }}</h5>
+
+              <div class="reviewer-profile">
+                <div class="profile-details">
+                  <div class="customer-name">{{ review.user.username }}</div>
+                  <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+                </div>
+              </div>
+
+              <div class="review-text">
+                <p>{{ review.comment }}</p>
+              </div>
+
+            </div>
+            {% empty %}
+            <p>No reviews yet.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+{% endblock %}

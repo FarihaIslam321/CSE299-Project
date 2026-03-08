@@ -106,3 +106,93 @@ def edit_profile(request):
     else:
         form = RegisterForm(instance=request.user)
     return render(request, 'edit_profile.html', {'form': form})
+
+
+@login_required
+def add_review(request):
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user  # assign current logged-in user
+            review.save()
+            messages.success(request, 'Review added successfully!')
+            return redirect('account')
+    else:
+        form = ReviewForm()
+    
+    return render(request, 'add_review.html', {'form': form})
+
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+    review.delete()
+    messages.success(request, 'Review deleted!')
+    return redirect('account')
+
+
+@login_required
+def add_payment_method(request):
+    if request.method == 'POST':
+        form = PaymentMethodForm(request.POST)
+        if form.is_valid():
+            payment = form.save(commit=False)
+            payment.user = request.user  # Assign logged-in user
+            payment.save()
+            messages.success(request, 'Payment method added successfully!')
+            return redirect('account')
+        else:
+            # Optional: show errors if form is invalid
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = PaymentMethodForm()
+    return render(request, 'add_payment.html', {'form': form})
+
+@login_required
+def delete_payment_method(request, payment_id):
+    payment = get_object_or_404(PaymentMethod, id=payment_id, user=request.user)
+    payment.delete()
+    messages.success(request, 'Payment method deleted!')
+    return redirect('account')
+
+
+
+@login_required
+def remove_wishlist(request, product_id):
+    """
+    Remove a product from the user's wishlist.
+    """
+    if request.method != "POST":
+        return redirect('account')
+
+    wishlist = Wishlist.objects.filter(user=request.user).first()
+    if not wishlist:
+        messages.error(request, "Wishlist not found.")
+        return redirect('account')
+
+    product = get_object_or_404(Product, id=product_id)
+    # remove product if exists in wishlist
+    wishlist.products.remove(product)
+    messages.success(request, f"Removed {product.title} from your wishlist.")
+    return redirect('account') 
+
+
+@login_required
+def toggle_wishlist(request, product_id):
+    if request.method != "POST":
+        return redirect('home')  # redirect if not POST
+
+    product = get_object_or_404(Product, id=product_id)
+    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+
+    if product in wishlist.products.all():
+        wishlist.products.remove(product)
+        messages.success(request, f"Removed {product.title} from your wishlist.")
+    else:
+        wishlist.products.add(product)
+        messages.success(request, f"Added {product.title} to your wishlist.")
+
+    # Redirect back to the same page
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
