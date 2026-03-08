@@ -15,5 +15,8 @@ urlpatterns = [
     path('wishlist/remove/<int:product_id>/', views.remove_wishlist, name='remove_wishlist'),
     path('wishlist/toggle/<int:product_id>/', views.toggle_wishlist, name='toggle_wishlist'),
     path('review/add/', views.add_review, name='add_review'),
-    
+    path('address/add/', views.add_address, name='add_address'),
+    path('address/edit/<int:address_id>/', views.edit_address, name='edit_address'),
+    path('address/delete/<int:address_id>/', views.delete_address, name='delete_address'),
+
 ]

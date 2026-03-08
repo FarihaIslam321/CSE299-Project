@@ -95,18 +95,6 @@ def account(request):
     }
     return render(request, 'account.html', context)
 
-@login_required
-def edit_profile(request):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('account')
-    else:
-        form = RegisterForm(instance=request.user)
-    return render(request, 'edit_profile.html', {'form': form})
-
 
 @login_required
 def add_review(request):
@@ -196,3 +184,50 @@ def toggle_wishlist(request, product_id):
 
     # Redirect back to the same page
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('account')
+    else:
+        form = RegisterForm(instance=request.user)
+    return render(request, 'edit_profile.html', {'form': form})
+
+@login_required
+def add_address(request):
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user  # Assign the logged-in user
+            address.save()
+            messages.success(request, 'Address added successfully!')
+            return redirect('account')
+    else:
+        form = AddressForm()
+    return render(request, 'add_address.html', {'form': form})
+
+@login_required
+def edit_address(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+    if request.method == 'POST':
+        form = AddressForm(request.POST, instance=address)
+        if form.is_valid():
+            form.save()  # Saves the existing instance
+            messages.success(request, 'Address updated successfully!')
+            return redirect('account')
+    else:
+        form = AddressForm(instance=address)
+    return render(request, 'edit_address.html', {'form': form})
+
+@login_required
+def delete_address(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+    address.delete()
+    messages.success(request, 'Address deleted!')
+    return redirect('account')

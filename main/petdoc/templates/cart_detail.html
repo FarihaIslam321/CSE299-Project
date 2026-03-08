@@ -1,0 +1,200 @@
+{% extends "partial/base.html" %}
+{% load static %}
+{% block content %}
+<main class="main">
+
+  <!-- Page Title -->
+  <div class="page-title light-background">
+    <div class="container d-lg-flex justify-content-between align-items-center">
+      <h1 class="mb-2 mb-lg-0">Cart</h1>
+      <nav class="breadcrumbs">
+        <ol>
+          <li><a href="{% url 'home' %}">Home</a></li>
+          <li class="current">Cart</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Cart Section -->
+  <section id="cart" class="cart section">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+      <div class="row">
+
+        <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
+
+          <!-- UPDATE CART FORM -->
+          <form action="{% url 'update_cart_quantity' %}" method="POST">
+            {% csrf_token %}
+
+            <div class="cart-items">
+              <div class="cart-header d-none d-lg-block">
+                <div class="row align-items-center">
+                  <div class="col-lg-6"><h5>Product</h5></div>
+                  <div class="col-lg-2 text-center"><h5>Price</h5></div>
+                  <div class="col-lg-2 text-center"><h5>Quantity</h5></div>
+                  <div class="col-lg-2 text-center"><h5>Total</h5></div>
+                </div>
+              </div>
+
+              {% for item in cart.items.all %}
+              <div class="cart-item">
+                <div class="row align-items-center">
+
+                  <!-- Product -->
+                  <div class="col-lg-6 col-12 mt-3">
+                    <div class="product-info d-flex align-items-center">
+                      <div class="product-image">
+                        {% if item.product.image %}
+                          <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="img-fluid">
+                        {% else %}
+                          <img src="{% static 'img/product/default.png' %}" class="img-fluid">
+                        {% endif %}
+                      </div>
+
+                      <div class="product-details">
+                        <h6 class="product-title">{{ item.product.title }}</h6>
+
+                        <button class="remove-item" type="button"
+                                onclick="location.href='{% url 'remove_cart_item' item.id %}'">
+                          <i class="bi bi-trash"></i> Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Price -->
+                  <div class="col-lg-2 col-12 text-center">
+                    <span class="current-price" >৳{{ item.product.price }}</span>
+                  </div>
+
+                  <!-- Quantity -->
+                  <div class="col-lg-2 col-12 text-center">
+                    <div class="quantity-selector">
+
+                      <button type="button" class="quantity-btn decrease">
+                        <i class="bi bi-dash"></i>
+                      </button>
+
+                      <input type="number"
+                             name="quantity_{{ item.id }}"
+                             class="quantity-input"
+                             value="{{ item.quantity }}"
+                             min="1" max="10">
+
+                      <button type="button" class="quantity-btn increase">
+                        <i class="bi bi-plus"></i>
+                      </button>
+
+                    </div>
+                  </div>
+
+                  <!-- Total -->
+                  <div class="col-lg-2 col-12 text-center">
+                    <span >৳{{ item.get_total }}</span>
+                  </div>
+
+                </div>
+              </div>
+              {% endfor %}
+
+              <!-- CART ACTIONS -->
+              <div class="cart-actions mt-3">
+                <div class="row">
+                  <div class="col-lg-6"></div>
+                  <div class="col-lg-6 text-md-end">
+                    <button type="submit" class="btn btn-outline-heading me-2">
+                      <i class="bi bi-arrow-clockwise"></i> Update Cart
+                    </button>
+
+                    <a href="{% url 'clear_cart' %}" class="btn btn-outline-remove">
+                      <i class="bi bi-trash"></i> Clear Cart
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </form>
+
+        </div>
+
+        <!-- ORDER SUMMARY -->
+        <div class="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-delay="300">
+          <div class="cart-summary">
+
+            <h4 class="summary-title">Order Summary</h4>
+
+            <div class="summary-item">
+              <span class="summary-label">Subtotal</span>
+              <span class="summary-value" >৳{{ subtotal }}</span>
+            </div>
+
+            <!-- SHIPPING -->
+            <div class="summary-item shipping-item">
+              <span class="summary-label">Shipping</span>
+
+              <form action="{% url 'update_shipping' %}" method="POST">
+                {% csrf_token %}
+
+                <div class="form-check text-end">
+                  <input type="radio" class="form-check-input" name="shipping" value="4.99"
+                  {% if shipping == 4.99 %}checked{% endif %}>
+                  <label class="form-check-label">Standard Delivery -  ৳4.99</label>
+                </div>
+
+                <div class="form-check text-end">
+                  <input type="radio" class="form-check-input" name="shipping" value="12.99"
+                  {% if shipping == 12.99 %}checked{% endif %}>
+                  <label class="form-check-label">Express Delivery -  ৳12.99</label>
+                </div>
+
+                <div class="form-check text-end">
+                  <input type="radio" class="form-check-input" name="shipping" value="0"
+                  {% if shipping == 0 %}checked{% endif %}>
+                  <label class="form-check-label">Free Shipping (Orders over  ৳300)</label>
+                </div>
+
+                <button class="btn btn-accent mt-2 w-100" type="submit">
+                  Update Shipping
+                </button>
+              </form>
+
+            </div>
+
+            <div class="summary-item">
+              <span class="summary-label">Tax</span>
+              <span class="summary-value" >৳{{ tax }}</span>
+            </div>
+
+            <div class="summary-item">
+              <span class="summary-label">Discount</span>
+              <span class="summary-value" >৳{{ discount }}</span>
+            </div>
+
+            <div class="summary-total">
+              <span class="summary-label">Total</span>
+              <span class="summary-value" >৳{{ grand_total }}</span>
+            </div>
+
+            <div class="checkout-button">
+              <a href="{% url 'checkout' %}" class="btn btn-accent w-100">
+                Proceed to Checkout <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="continue-shopping">
+              <a href="{% url 'home' %}" class="btn btn-link w-100">
+                <i class="bi bi-arrow-left"></i> Continue Shopping
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+{% endblock content %}

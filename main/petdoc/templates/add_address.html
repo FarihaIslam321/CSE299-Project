@@ -1,0 +1,57 @@
+{% extends "partial/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container py-5">
+  <h2>Add Address</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="mb-3">
+      <label class="form-label">Title</label>
+      {{ form.title|add_class:"form-control" }}
+      {{ form.title.errors }}
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Address</label>
+      {{ form.address_line|add_class:"form-control" }}
+      {{ form.address_line.errors }}
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">City</label>
+        {{ form.city|add_class:"form-control" }}
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">State</label>
+        {{ form.state|add_class:"form-control" }}
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Postal Code</label>
+        {{ form.postal_code|add_class:"form-control" }}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Country</label>
+        {{ form.country|add_class:"form-control" }}
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Phone</label>
+        {{ form.phone|add_class:"form-control" }}
+      </div>
+    </div>
+
+    <div class="mb-3 form-check">
+      {{ form.is_default|add_class:"form-check-input" }}
+      <label class="form-check-label">Set as default</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add address</button>
+  </form>
+</div>
+{% endblock content %}
