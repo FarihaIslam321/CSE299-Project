@@ -9,4 +9,7 @@ urlpatterns = [
     path('cart/', views.cart_detail, name='cart_detail'),
     path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/remove/<int:item_id>/', views.remove_cart_item, name='remove_cart_item'),
+    path('cart/update/', views.update_cart_quantity, name='update_cart_quantity'),
+    path('cart/clear/', views.clear_cart, name='clear_cart'),
+    path('cart/update-shipping/', views.update_shipping, name='update_shipping'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

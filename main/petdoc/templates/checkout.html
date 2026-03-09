@@ -1,0 +1,198 @@
+{% extends "partial/base.html" %}
+{% load static %}
+{% block content %}
+
+<main class="main">
+
+  <!-- Page Title -->
+  <div class="page-title light-background">
+    <div class="container d-lg-flex justify-content-between align-items-center">
+      <h1 class="mb-2 mb-lg-0">Checkout</h1>
+      <nav class="breadcrumbs">
+        <ol>
+          <li><a href="{% url 'home' %}">Home</a></li>
+          <li class="current">Checkout</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Checkout Section -->
+  <section id="checkout" class="checkout section">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="row">
+
+        <!-- LEFT SIDE -->
+        <div class="col-lg-7">
+          <div class="checkout-container" data-aos="fade-up">
+            <form method="POST" action="{% url 'place_order' %}" class="checkout-form">
+              {% csrf_token %}
+
+              <!-- Customer Info -->
+              <div class="checkout-section" id="customer-info">
+                <div class="section-header">
+                  <div class="section-number">1</div>
+                  <h3>Customer Information</h3>
+                </div>
+                <div class="section-content">
+
+                  <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                  </div>
+
+                  {% if default_address %}
+                  <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" class="form-control" value="{{ default_address.phone }}" readonly>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Shipping -->
+              <div class="checkout-section" id="shipping-address">
+                <div class="section-header">
+                  <div class="section-number">2</div>
+                  <h3>Shipping Address</h3>
+                </div>
+                <div class="section-content">
+
+                  <div class="form-group">
+                    <label>Street Address</label>
+                    <input type="text" class="form-control" value="{{ default_address.address_line }}" readonly>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-4 form-group">
+                      <label>City</label>
+                      <input type="text" class="form-control" value="{{ default_address.city }}" readonly>
+                    </div>
+                    <div class="col-md-4 form-group">
+                      <label>State</label>
+                      <input type="text" class="form-control" value="{{ default_address.state }}" readonly>
+                    </div>
+                    <div class="col-md-4 form-group">
+                      <label>ZIP Code</label>
+                      <input type="text" class="form-control" value="{{ default_address.postal_code }}" readonly>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" class="form-control" value="{{ default_address.country }}" readonly>
+                  </div>
+
+                  {% else %}
+                  <p class="text-danger">No default address found. Please add one.</p>
+                  {% endif %}
+
+                </div>
+              </div>
+
+              <!-- Payment -->
+              <div class="checkout-section" id="payment-method">
+                <div class="section-header">
+                  <div class="section-number">3</div>
+                  <h3>Payment Method</h3>
+                </div>
+                <div class="section-content">
+
+                  <div class="payment-options">
+                    <div class="payment-option active">
+                      <input type="radio" name="payment-method" value="Card" checked>
+                      <label>Credit / Debit Card</label>
+                    </div>
+                    <div class="payment-option">
+                      <input type="radio" name="payment-method" value="PayPal">
+                      <label>PayPal</label>
+                    </div>
+                    <div class="payment-option">
+                      <input type="radio" name="payment-method" value="Apple Pay">
+                      <label>Apple Pay</label>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE ORDER SUMMARY -->
+        <div class="col-lg-5 mt-4 mt-lg-0">
+          <div class="cart-summary p-4 border rounded shadow bg-white" data-aos="fade-left">
+
+            <h4 class="summary-title mb-4 text-center">Order Summary</h4>
+
+            <!-- ITEMS -->
+            <div class="summary-cart-items mb-3">
+              {% for item in cart_items %}
+              <div class="border-bottom py-2">
+                <div class="fw-bold">{{ item.product.title }}</div>
+
+                <div class="d-flex justify-content-between small text-muted">
+                  <span>Unit Price: ৳{{ item.product.price }}</span>
+                  <span>Qty: {{ item.quantity }}</span>
+                  <span>Total: <strong>৳{{ item.get_total }}</strong></span>
+                </div>
+              </div>
+              {% empty %}
+              <p class="text-center text-muted">Your cart is empty.</p>
+              {% endfor %}
+            </div>
+
+            <!-- Subtotal -->
+            <div class="summary-item d-flex justify-content-between py-2 border-top">
+              <span>Subtotal</span>
+              <span class="fw-bold">৳{{ subtotal }}</span>
+            </div>
+
+            <!-- Shipping -->
+            <div class="summary-item py-2">
+              <span>Shipping</span>
+              <br>
+              <span class="fw-bold text-primary">৳{{ shipping }}</span>
+            </div>
+
+            <!-- Tax -->
+            <div class="summary-item d-flex justify-content-between py-2 border-top">
+              <span>Tax</span>
+              <span>৳{{ tax }}</span>
+            </div>
+
+            <!-- Discount -->
+            <div class="summary-item d-flex justify-content-between py-2">
+              <span>Discount</span>
+              <span>- ৳{{ discount }}</span>
+            </div>
+
+            <!-- GRAND TOTAL -->
+            <div class="summary-total d-flex justify-content-between py-3 border-top border-bottom mt-3">
+              <span class="fs-5 fw-bold">Total</span>
+              <span class="fs-5 fw-bold text-success">৳{{ grand_total |floatformat:2}}</span>
+            </div>
+
+            <!-- PLACE ORDER BUTTON HERE -->
+            <form method="POST" action="{% url 'place_order' %}">
+              {% csrf_token %}
+              <button class="btn btn-primary w-100 mt-3 py-2 fs-5">
+                Place Order — ৳{{ grand_total|floatformat:2 }}
+              </button>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+{% endblock content %}

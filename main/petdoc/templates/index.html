@@ -1,149 +1,296 @@
-{% extends "partial/base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 {% load static %}
-{% block content %}
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>petdoc</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
 
+  <!-- Favicons -->
+  <link href="{% static 'img/favicon.png' %}" rel="icon">
+  <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
-<style>
-  /* Fixed Header */
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
 
-/* Account Dropdown on Right */
-.account-dropdown {
-    position: absolute;
-    top: 20px; /* Adjust for distance from the top */
-    right: 10px; /* Positioned to the right */
-    z-index: 2000; /* Ensure the dropdown appears above other content */
-}
+  <!-- Main CSS File -->
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
 
-/* Dropdown button for login profile */
-.header-action-btn {
-    background-color: transparent;
-    border: none;
-    font-size: 24px;
-    color: #ffffff;
-    transition: color 0.3s ease;
-}
-
-.header-action-btn:hover {
-    color: #ffcc00; /* Change to a contrasting color (gold) on hover */
-}
-
-/* Dropdown Menu */
-.dropdown-menu {
-    position: absolute;
-    right: 0;
-    background-color: rgba(255, 255, 255, 0.1); /* Add glassmorphism effect */
-    backdrop-filter: blur(10px); /* Blur effect */
-    border-radius: 8px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    width: 220px; /* Adjust width of the dropdown */
-    padding: 15px;
-    display: none;
-    z-index: 1000;
-}
-
-.dropdown-menu.show {
-    display: block;
-}
-
-/* Styling for dropdown items */
-.dropdown-item {
-    font-size: 14px;
-    color: white;
-    padding: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.dropdown-item:hover {
-    background-color: #007bff; /* Blue background on hover */
-    color: white;
-    border-radius: 4px;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .account-dropdown {
-        top: 60px; /* Adjust the dropdown for smaller screens */
-        right: 10px;
-    }
-
+  <style>
+    /* Add smooth hover effect and vibrant background for the dropdown */
     .dropdown-menu {
-        width: 100%; /* Full width on smaller screens */
+      border-radius: 8px;
+      padding: 10px;
+      background: linear-gradient(145deg, #f1f1f1bb, #e2e2e2a8);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
     }
-}
-</style>
 
-<main class="main">
+    /* Make the header text light blue */
+    .dropdown-header h6 {
+      color: #130315a6;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
 
-  <!-- Account Dropdown -->
-<div class="dropdown account-dropdown">
-  <button class="header-action-btn" data-bs-toggle="dropdown">
-    <i class="bi bi-person"></i>
-  </button>
+    /* Smooth hover effect for dropdown items */
+    .dropdown-item {
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
 
-  <div class="dropdown-menu dropdown-menu-left">
-    {% if user.is_authenticated %}
-      <!-- LOGGED-IN VIEW -->
-      <div class="dropdown-header">
-        <h6 class="text-primary">Hello, {{ user.username }}</h6>
+    .dropdown-item:hover {
+      background-color: #007bff;
+      color: #fff !important;
+      border-radius: 4px;
+    }
+
+    /* Add rounded corners to buttons */
+    .dropdown-footer .btn {
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 14px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Left-align the dropdown */
+    .dropdown-menu-left {
+      left: -100px;
+    }
+
+    /* Style the profile and logout buttons */
+    .dropdown-body a i {
+      font-size: 18px;
+    }
+
+    /* Style for dropdown button (Profile icon) */
+    .header-action-btn {
+      background-color: transparent;
+      border: none;
+      font-size: 24px;
+      color: #ffffff;
+      transition: color 0.3s ease;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-action-btn:hover {
+      color: #ffcc00;
+    }
+
+    /* Transparent effect for sign-in/sign-up buttons */
+    .dropdown-footer .btn {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      color: #5109e2;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Hover effect for transparent buttons */
+    .dropdown-footer .btn:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
+    }
+
+    /* Focus effect for buttons */
+    .dropdown-footer .btn:focus {
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.8);
+    }
+
+    footer a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: #0056b3;
+    }
+
+    footer .footer-about .social-links a {
+      color: #007bff;
+      font-size: 18px;
+    }
+
+    footer .footer-about .social-links a:hover {
+      color: #ffcc00;
+    }
+
+    /* Account Dropdown on Right */
+    .account-dropdown {
+      position: absolute;
+      top: 20px;
+      right: 10px;
+      z-index: 2000;
+    }
+
+    /* Dropdown button for login profile */
+    .header-action-btn {
+      background-color: transparent;
+      border: none;
+      font-size: 24px;
+      color: #ffffff;
+      transition: color 0.3s ease;
+    }
+
+    .header-action-btn:hover {
+      color: #ffcc00;
+    }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 8px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      width: 220px;
+      padding: 15px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    /* Styling for dropdown items */
+    .dropdown-item {
+      font-size: 14px;
+      color: white;
+      padding: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .dropdown-item:hover {
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .account-dropdown {
+        top: 60px;
+        right: 10px;
+      }
+
+      .dropdown-menu {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="#" class="logo d-flex align-items-center me-auto me-xl-0">
+        <svg class="my-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g id="bgCarrier" stroke-width="0"></g>
+          <g id="tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="iconCarrier">
+            <path d="M22 22L2 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M17 22V6C17 4.11438 17 3.17157 16.4142 2.58579C15.8284 2 14.8856 2 13 2H11C9.11438 2 8.17157 2 7.58579 2.58579C7 3.17157 7 4.11438 7 6V22" stroke="currentColor" stroke-width="1.5"></path>
+            <path opacity="0.5" d="M21 22V8.5C21 7.09554 21 6.39331 20.6629 5.88886C20.517 5.67048 20.3295 5.48298 20.1111 5.33706C19.6067 5 18.9045 5 17.5 5" stroke="currentColor" stroke-width="1.5"></path>
+          </g>
+        </svg>
+        <h1 class="sitename">Petdoc</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'home' %}" class="active">Home</a></li>
+          <li><a href="#">Shop</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="#">Appointment</a>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Account Dropdown -->
+    <div class="dropdown account-dropdown">
+      <button class="header-action-btn" data-bs-toggle="dropdown">
+        <i class="bi bi-person"></i>
+      </button>
+
+      <div class="dropdown-menu dropdown-menu-left">
+        {% if user.is_authenticated %}
+          <!-- LOGGED-IN VIEW -->
+          <div class="dropdown-header">
+            <h6 class="text-primary">Hello, {{ user.username }}</h6>
+          </div>
+
+          <div class="dropdown-body">
+            <a class="dropdown-item" href="{% url 'account' %}">
+              <i class="bi bi-person-circle me-2"></i> My Profile
+            </a>
+          </div>
+
+          <div class="dropdown-footer">
+            <form method="POST" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button class="btn btn-danger w-100">Logout</button>
+            </form>
+          </div>
+
+        {% else %}
+          <!-- GUEST VIEW -->
+          <div class="dropdown-header">
+            <h6>Welcome to Petdoc</h6>
+          </div>
+
+          <div class="dropdown-footer">
+            <a href="{% url 'login' %}" class="btn btn-primary w-100 mb-2">Sign In</a>
+            <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">Create Account</a>
+          </div>
+        {% endif %}
       </div>
+    </div>
 
-      <div class="dropdown-body">
-        <a class="dropdown-item" href=# >
-          <i class="bi bi-person-circle me-2"></i> My Profile
-        </a>
-        <a class="dropdown-item" href=# >
-          <i class="bi bi-gear me-2"></i> Settings
-        </a>
-      </div>
+    <!-- Hero Section -->
+    <section id="hero" class="hero section dark-background">
+      <div class="container-fluid p-0">
+        <div class="hero-wrapper">
+          <div class="hero-image">
+            <img src="{% static 'img/petdoc.jpg' %}" alt="Advanced Healthcare" class="img-fluid">
+          </div>
 
-      <div class="dropdown-footer">
-        <form method="POST" action="{% url 'logout' %}" >
-          {% csrf_token %}
-          <button class="btn btn-danger w-100">Logout</button>
-        </form>
-      </div>
+          <div class="hero-content">
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-7 col-md-10" data-aos="fade-right" data-aos-delay="100">
+                  <div class="content-box">
+                    <span class="badge-accent" data-aos="fade-up" data-aos-delay="150">Leading Petcare Specialists</span>
+                    <h1 data-aos="fade-up" data-aos-delay="200">Advanced Medical Care for Your Pet</h1>
 
-    {% else %}
-      <!-- GUEST VIEW -->
-      <div class="dropdown-header">
-        <h6>Welcome to Petdoc</h6>
-      </div>
+                    <div class="cta-group" data-aos="fade-up" data-aos-delay="300">
+                      <a href="appointment.html" class="btn btn-primary">Ai Assitant</a>
+                    </div>
 
-      <div class="dropdown-footer">
-        <a href="{% url 'login' %}" class="btn btn-primary w-100 mb-2">Sign In</a>
-        <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">Create Account</a>
-      </div>
-    {% endif %}
-  </div>
-</div>
-
-  <!-- Hero Section -->
-  <section id="hero" class="hero section dark-background">
-    <div class="container-fluid p-0">
-      <div class="hero-wrapper">
-        <div class="hero-image">
-          <img src="{% static 'img/petdoc.jpg' %}" alt="Advanced Healthcare" class="img-fluid">
-        </div>
-
-        <div class="hero-content">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-7 col-md-10" data-aos="fade-right" data-aos-delay="100">
-                <div class="content-box">
-                  <span class="badge-accent" data-aos="fade-up" data-aos-delay="150">Leading Petcare Specialists</span>
-                  <h1 data-aos="fade-up" data-aos-delay="200">Advanced Medical Care for Your Pet</h1>
-
-                  <div class="cta-group" data-aos="fade-up" data-aos-delay="300">
-                    <a href="appointment.html" class="btn btn-primary">Ai Assitant</a>
-                  </div>
-
-                  <div class="info-badges" data-aos="fade-up" data-aos-delay="350">
-                    <div class="badge-item">
-                      <i class="bi bi-clock-fill"></i>
-                      <div class="badge-content">
-                        <span>Working Hours</span>
-                        <strong>Mon-Fri: 8AM-8PM</strong>
+                    <div class="info-badges" data-aos="fade-up" data-aos-delay="350">
+                      <div class="badge-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <div class="badge-content">
+                          <span>Working Hours</span>
+                          <strong>Mon-Fri: 8AM-8PM</strong>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -153,46 +300,127 @@
           </div>
         </div>
       </div>
-    </div>
-  </section><!-- /Hero Section -->
+    </section><!-- /Hero Section -->
 
-  <!-- Pet Care Information Section -->
-  <section id="pet-care" class="section light-background">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-md-12" data-aos="fade-right" data-aos-delay="100">
-          <div class="content-box">
-            <h2 class="section-title">Comprehensive Pet Healthcare</h2>
-            <p>We offer the best in pet healthcare, ensuring your pet is healthy and happy. From regular checkups to advanced treatments, our team of experts is here for your furry friend.</p>
-            <p>Whether it's a routine vaccination or a specialized treatment, we use the latest technology to give your pets the care they deserve.</p>
+    <!-- Pet Care Information Section -->
+    <section id="pet-care" class="section light-background">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 col-md-12" data-aos="fade-right" data-aos-delay="100">
+            <div class="content-box">
+              <h2 class="section-title">Comprehensive Pet Healthcare</h2>
+              <p>We offer the best in pet healthcare, ensuring your pet is healthy and happy. From regular checkups to advanced treatments, our team of experts is here for your furry friend.</p>
+              <p>Whether it's a routine vaccination or a specialized treatment, we use the latest technology to give your pets the care they deserve.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-12" data-aos="fade-left" data-aos-delay="200">
+            <div class="image-box">
+              <img src="{% static 'img/petcare4.webp' %}" alt="Pet Care" class="img-fluid rounded">
+            </div>
           </div>
         </div>
 
-        <div class="col-lg-6 col-md-12" data-aos="fade-left" data-aos-delay="200">
-          <div class="image-box">
-            <img src="{% static 'img/petcare4.webp' %}" alt="Pet Care" class="img-fluid rounded">
+        <div class="row mt-5">
+          <div class="col-lg-6 col-md-12" data-aos="fade-right" data-aos-delay="300">
+            <div class="image-box">
+              <img src="{% static 'img/petcare1.jpg' %}" alt="Pet Care" class="img-fluid rounded">
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-12" data-aos="fade-left" data-aos-delay="400">
+            <div class="content-box">
+              <h2 class="section-title">Healthy Pets, Happy Homes</h2>
+              <p>We believe that a healthy pet makes a happy home. Our goal is to ensure that your pets are not only healthy but also thriving. Visit us for tailored pet care solutions that meet your pet’s unique needs.</p>
+              <p>Our team will guide you every step of the way, from nutritional advice to treatment options. You can trust us to care for your pets like family!</p>
+            </div>
           </div>
         </div>
       </div>
+    </section><!-- /Pet Care Information Section -->
 
-      <div class="row mt-5">
-        <div class="col-lg-6 col-md-12" data-aos="fade-right" data-aos-delay="300">
-          <div class="image-box">
-            <img src="{% static 'img/petcare1.jpg' %}" alt="Pet Care" class="img-fluid rounded">
+  </main>
+
+  <footer id="footer" class="footer position-relative light-background">
+    <div class="container footer-top py-5">
+      <div class="row gy-4">
+
+        <!-- Footer About Section -->
+        <div class="col-lg-4 col-md-6 footer-about" style="background-color: #f4f8fb; padding: 20px; border-radius: 10px;">
+          <a href="index.html" class="logo d-flex align-items-center">
+            <span class="sitename">Petdoc</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>Bashundhara R/A</p>
+            <p>Dhaka</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+880 172 3827338</span></p>
+            <p><strong>Email:</strong> <span>petdoc@gmail.com</span></p>
+          </div>
+          <div class="social-links d-flex mt-4">
+            <a href="#" class="me-2"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="me-2"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="me-2"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
           </div>
         </div>
 
-        <div class="col-lg-6 col-md-12" data-aos="fade-left" data-aos-delay="400">
-          <div class="content-box">
-            <h2 class="section-title">Healthy Pets, Happy Homes</h2>
-            <p>We believe that a healthy pet makes a happy home. Our goal is to ensure that your pets are not only healthy but also thriving. Visit us for tailored pet care solutions that meet your pet’s unique needs.</p>
-            <p>Our team will guide you every step of the way, from nutritional advice to treatment options. You can trust us to care for your pets like family!</p>
-          </div>
+        <!-- Footer Useful Links Section -->
+        <div class="col-lg-4 col-md-6 footer-links" style="background-color: #e9f5f9; padding: 20px; border-radius: 10px;">
+          <h4>Useful Links</h4>
+          <ul class="list-unstyled">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About us</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Privacy policy</a></li>
+          </ul>
         </div>
+
+        <!-- Footer Contact Us Section -->
+        <div class="col-lg-4 col-md-6 footer-links" style="background-color: #d6f2fb; padding: 20px; border-radius: 10px;">
+          <h4>Contact Us</h4>
+          <ul class="list-unstyled">
+            <li><a href="#">Support</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+
       </div>
     </div>
-  </section><!-- /Pet Care Information Section -->
 
-</main>
+    <!-- Footer Bottom Section -->
+    <div class="container copyright text-center mt-4" style="background-color: #2b3a4a; color: white; padding: 15px;">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">Petdoc</strong> <span>All Rights Reserved</span></p>
+    </div>
+  </footer>
 
-{% endblock content %}
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'js/main.js' %}"></script>
+
+  <script>
+    let lastScrollTop = 0;
+    const header = document.querySelector('.header');
+
+    window.addEventListener('scroll', function() {
+      let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (currentScroll > lastScrollTop) {
+        header.style.top = "-80px";
+      } else {
+        header.style.top = "0";
+      }
+
+      lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+    });
+  </script>
+
+</body>
+</html>

@@ -107,3 +107,13 @@ def add_to_cart(request, product_id):
 
     messages.success(request, f"{product.title} (x{quantity}) added to cart!")
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+@login_required(login_url='login')
+def update_shipping(request):
+    if request.method == "POST":
+        shipping = request.POST.get("shipping", "4.99")
+        request.session["shipping"] = str(shipping)  # store as string for Decimal safety
+        messages.success(request, "Shipping updated!")
+
+    return redirect('cart_detail')

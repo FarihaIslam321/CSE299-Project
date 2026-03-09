@@ -31,7 +31,7 @@ def register_view(request):
                 user.is_superuser = False    # ensure normal user
                 user.save()                  # save to DB
                 messages.success(request, "Account created successfully! You can now log in.")
-                return redirect("home")  # Change to login page URL if needed
+                return redirect("login")  # Change to login page URL if needed
         else:
             # Collect and display all form errors
             for field, errors in form.errors.items():
@@ -231,3 +231,117 @@ def delete_address(request, address_id):
     address.delete()
     messages.success(request, 'Address deleted!')
     return redirect('account')
+
+
+@login_required
+def checkout(request):
+
+    # Get user cart
+    try:
+        cart = Cart.objects.get(user=request.user)
+    except Cart.DoesNotExist:
+        cart = None
+
+    cart_items = cart.items.all() if cart else []
+
+    # Calculate totals
+    subtotal = sum(item.get_total() for item in cart_items)  # subtotal is Decimal
+    shipping = Decimal(request.session.get("shipping", 0))
+    tax = subtotal * Decimal("0.05")   # FIXED
+    discount = Decimal("0")
+    grand_total = subtotal + shipping + tax - discount
+
+    # Get Default Address
+    default_address = Address.objects.filter(user=request.user, is_default=True).first()
+
+    context = {
+        "cart": cart,
+        "cart_items": cart_items,
+        "subtotal": subtotal,
+        "tax": tax,
+        "shipping": shipping,
+        "discount": discount,
+        "grand_total": grand_total,
+        "default_address": default_address,
+    }
+
+    if request.session.get('buy_now'):
+        del request.session['buy_now']
+        
+
+    return render(request, "checkout.html", context)
+
+
+@login_required
+def place_order(request):
+    if request.method == "POST":
+        cart = Cart.objects.filter(user=request.user).first()
+
+        if not cart or not cart.items.exists():
+            messages.error(request, "Your cart is empty!")
+            return redirect("checkout")
+
+        # Get user's default address
+        default_address = Address.objects.filter(user=request.user, is_default=True).first()
+        if not default_address:
+            messages.error(request, "Please add a default shipping address.")
+            return redirect("checkout")
+
+        # Totals
+        subtotal = sum(item.get_total() for item in cart.items.all())
+        shipping = Decimal(request.session.get("shipping", 0))
+        tax = subtotal * Decimal("0.05")
+        discount = Decimal("0")
+        grand_total = subtotal + shipping + tax - discount
+
+        # Create order (must match your model fields!)
+        order = Order.objects.create(
+            user=request.user,
+            total_amount=grand_total,
+        )
+
+        # Create order items
+        for item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.price,
+            )
+
+        # Empty cart
+        cart.items.all().delete()
+
+        messages.success(request, "🎉 Your order has been placed successfully!")
+        return redirect("order_success")
+
+    return redirect("checkout")
+
+
+def order_success(request):
+    return render(request, "order_success.html")
+
+
+@login_required(login_url='login')
+def buy_now(request, product_id):
+    if request.method == "POST":
+        product = get_object_or_404(Product, id=product_id)
+        quantity = int(request.POST.get("quantity", 1))
+
+        # Get or create cart
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+
+        # Add product to cart
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        if created:
+            cart_item.quantity = quantity
+        else:
+            cart_item.quantity += quantity
+        cart_item.save()
+
+        # Store flag in session to go directly to checkout
+        request.session['buy_now'] = True
+
+        return redirect('checkout')
+    else:
+        return redirect(request.META.get('HTTP_REFERER', 'home'))
