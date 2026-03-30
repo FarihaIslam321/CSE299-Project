@@ -19,16 +19,7 @@
                 <p>Sign in to your account</p>
               </div>
 
-              <!-- Display Django messages -->
-              {% if messages %}
-              <div class="mb-3">
-                {% for message in messages %}
-                  <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                    {{ message }}
-                  </div>
-                {% endfor %}
-              </div>
-              {% endif %}
+            
 
               <form class="auth-form-content" method="POST">
                 {% csrf_token %}
@@ -85,9 +76,6 @@
     </div>
   </section><!-- /Login Section -->
 
-</main>
-
-{% endblock content %}
 
 <script>
   // Function to toggle password visibility
@@ -106,3 +94,8 @@
     }
   }
 </script>
+
+</main>
+
+{% endblock content %}
+

@@ -4,16 +4,44 @@
 <main class="main">
 
   <div class="page-title light-background">
-    <div class="container d-lg-flex justify-content-between align-items-center">
-      <h1 class="mb-2 mb-lg-0">Product Details</h1>
-      <nav class="breadcrumbs">
-        <ol>
-          <li><a href="{% url 'home' %}">Home</a></li>
-          <li class="current">{{ product.title }}</li>
-        </ol>
-      </nav>
-    </div>
+  <div class="container d-lg-flex justify-content-between align-items-center">
+    
+    
+
+    <nav class="breadcrumbs mt-3 mt-lg-0">
+      <a href="{% url 'shop_page' %}" class="shop-corner-btn">
+        <i class="bi bi-bag-check me-2"></i> Go to Shop
+      </a>
+    </nav>
   </div>
+</div>
+
+<style>
+  .shop-corner-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    color: #fff !important;
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.25);
+    transition: all 0.3s ease;
+  }
+
+  .shop-corner-btn:hover {
+    background: linear-gradient(135deg, #0b5ed7, #084298);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(13, 110, 253, 0.35);
+  }
+
+  .shop-corner-btn i {
+    font-size: 16px;
+  }
+</style>
 
   <section id="product-details" class="product-details section">
     <div class="container" data-aos="fade-up" data-aos-delay="100">

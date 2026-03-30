@@ -1,0 +1,491 @@
+{% extends "partial/base.html" %}
+{% load static %}
+{% block content %}
+
+<main class="main">
+
+  <style>
+    .shop-hero {
+      background: linear-gradient(135deg, #f4fff8 0%, #eef7ff 100%);
+      padding: 70px 0 50px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .shop-badge {
+      display: inline-block;
+      background: #e8fff1;
+      color: #198754;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .shop-title {
+      font-size: 42px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+
+    .shop-subtitle {
+      font-size: 17px;
+      color: #6b7280;
+      max-width: 760px;
+      margin: 0 auto 25px;
+    }
+
+    .shop-top-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+ 
+
+    .shop-top-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s ease;
+    }
+
+    .shop-top-btn.primary {
+      background: #0d6efd;
+      color: #fff;
+    }
+
+    .shop-top-btn.primary:hover {
+      background: #0b5ed7;
+      color: #fff;
+    }
+
+    .shop-top-btn.outline {
+      border: 1px solid #d0d7de;
+      color: #111827;
+      background: #fff;
+    }
+
+    .shop-top-btn.outline:hover {
+      background: #f8f9fa;
+      color: #111827;
+    }
+
+    .cart-badge-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cart-count-badge {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #dc3545;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      line-height: 1;
+    }
+
+    .shop-section {
+      padding: 60px 0;
+    }
+
+    .section-mini-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-mini-title h2 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    .section-mini-title p {
+      color: #6b7280;
+      max-width: 700px;
+      margin: 0 auto;
+      font-size: 16px;
+    }
+
+    .product-item {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      transition: 0.3s ease;
+      height: 100%;
+      border: 1px solid #f1f1f1;
+    }
+
+    .product-item:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-link-wrapper {
+      height: 100%;
+    }
+
+    .product-image {
+      position: relative;
+      background: #f8f9fa;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .product-image img {
+      max-height: 100%;
+      width: 100%;
+      object-fit: cover;
+      transition: 0.35s ease;
+    }
+
+    .product-item:hover .product-image img {
+      transform: scale(1.05);
+    }
+
+    .product-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: #198754;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .product-info {
+      padding: 20px 18px 18px;
+    }
+
+    .product-category {
+      font-size: 13px;
+      color: #198754;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 8px;
+    }
+
+    .product-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 10px;
+      min-height: 48px;
+    }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stars {
+      color: #f59e0b;
+      display: flex;
+      gap: 2px;
+      font-size: 14px;
+    }
+
+    .rating-count {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .product-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .product-price-box {
+      font-size: 22px;
+      font-weight: 800;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .currency-symbol {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0d6efd;
+    }
+
+    .product-action-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-action-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.25s ease;
+      cursor: pointer;
+    }
+
+    .icon-action-btn:hover {
+      background: #f3f6fb;
+      border-color: #cfd8e3;
+    }
+
+    .icon-action-btn i {
+      font-size: 19px;
+      color: #1f2937;
+    }
+
+    .shop-empty-box {
+      background: #fff;
+      border: 1px dashed #d1d5db;
+      border-radius: 18px;
+      padding: 50px 20px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    @media (max-width: 767px) {
+      .shop-title {
+        font-size: 30px;
+      }
+
+      .shop-subtitle {
+        font-size: 15px;
+      }
+
+      .product-image {
+        height: 220px;
+      }
+
+      .product-name {
+        font-size: 18px;
+        min-height: auto;
+      }
+    }
+  </style>
+
+  <!-- Shop Hero -->
+  <section class="shop-hero">
+    <div class="container text-center">
+      <span class="shop-badge">Trusted Animal Care Shop</span>
+      <h1 class="shop-title">All Animal Medicine, Pet Care & Accessories in One Place</h1>
+      <p class="shop-subtitle">
+        Explore our complete collection of veterinary medicines, pet essentials, grooming tools,
+        feeding accessories, health products, and everyday care items for animals. Quality products,
+        reliable support, and easy ordering for your animal care needs.
+      </p>
+
+      <div class="shop-top-actions">
+        <a href="{% url 'home' %}" class="shop-top-btn outline">
+          <i class="bi bi-house-door"></i> Back to Home
+        </a>
+
+         <a href="{% url 'cart_detail' %}"
+     class="shop-top-btn primary cart-badge-wrap"
+     onclick="return handleCartClick(event, {{ cart_count|default:0 }});">
+    <i class="bi bi-cart3"></i> View Cart
+    {% if cart_count %}
+      <span class="cart-count-badge">{{ cart_count }}</span>
+    {% else %}
+      <span class="cart-count-badge">0</span>
+    {% endif %}
+  </a>
+</div>
+
+<div id="cart-empty-message"
+     style="display:none; max-width:360px; margin:14px auto 0; background:#fff3cd; color:#856404; border:1px solid #ffe69c; padding:12px 16px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.08); font-weight:600;">
+  <i class="bi bi-cart-x" style="margin-right:8px;"></i>
+  No item in cart
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="shop-section">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="section-mini-title">
+        <h2>Shop Products</h2>
+        <p>
+          Browse all available products for medicine, treatment, care, feeding, hygiene,
+          and daily accessories for pets and animals.
+        </p>
+      </div>
+
+      <div class="row g-4">
+        {% for product in products %}
+        <div class="col-lg-3 col-md-6">
+          <div class="product-item">
+
+            <div class="product-link-wrapper"
+                 style="text-decoration:none; color:inherit; display:block; cursor:pointer;"
+                 onclick="window.location.href='{% url 'product_details' product.id %}'">
+
+              <div class="product-image">
+                {% if product.label %}
+                <div class="product-badge">{{ product.label }}</div>
+                {% endif %}
+
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.title }}" class="img-fluid" loading="lazy">
+                {% else %}
+                <img src="{% static 'img/no-image.png' %}" class="img-fluid" alt="No Image">
+                {% endif %}
+              </div>
+
+              <div class="product-info">
+                <div class="product-category">
+                  {% if product.category %}
+                    {{ product.category.title }}
+                  {% else %}
+                    Uncategorized
+                  {% endif %}
+                </div>
+
+                <h4 class="product-name">{{ product.title }}</h4>
+
+                <div class="product-rating">
+                  <div class="stars">
+                    {% with avg=product.avg_rating %}
+                      {% if avg >= 1 %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}
+                      {% if avg >= 2 %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}
+                      {% if avg >= 3 %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}
+                      {% if avg >= 4 %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}
+                      {% if avg >= 5 %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}
+                    {% endwith %}
+                  </div>
+                  <span class="rating-count">({{ product.review_count }}) Reviews</span>
+                </div>
+
+                <div class="product-price-row">
+                  <div class="product-price-box">
+                    <span class="currency-symbol">৳</span>
+                    <span>{{ product.price }}</span>
+                  </div>
+
+                  <div class="product-action-group">
+
+                    <form method="post"
+                          action="{% url 'toggle_wishlist' product.id %}"
+                          style="display:inline;"
+                          onsubmit="event.stopPropagation();">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="icon-action-btn"
+                              style="border:none;"
+                              onclick="event.stopPropagation();"
+                              title="Add to Wishlist">
+                        <i class="bi bi-heart"></i>
+                      </button>
+                    </form>
+
+                    <form action="{% url 'add_to_cart' product.id %}"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="event.stopPropagation();">
+                      {% csrf_token %}
+                      {% if user.is_authenticated %}
+                      <button type="submit"
+                              class="icon-action-btn"
+                              style="border:none;"
+                              onclick="event.stopPropagation();"
+                              title="Add to Cart">
+                        <i class="bi bi-cart-plus"></i>
+                      </button>
+                      {% else %}
+                      <button type="button"
+                              class="icon-action-btn"
+                              style="border:none;"
+                              onclick="event.stopPropagation(); alert('Please log in first to add items to your cart.')"
+                              title="Add to Cart">
+                        <i class="bi bi-cart-plus"></i>
+                      </button>
+                      {% endif %}
+                    </form>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="shop-empty-box">
+            <i class="bi bi-bag-x" style="font-size: 48px; color: #9ca3af;"></i>
+            <h4 class="mt-3 mb-2">No Products Found</h4>
+            <p class="mb-0">There are no products available in the shop right now.</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </section>
+
+<script>
+  function handleCartClick(event, cartCount) {
+    if (cartCount <= 0) {
+      event.preventDefault();
+
+      const messageBox = document.getElementById("cart-empty-message");
+      if (messageBox) {
+        messageBox.style.display = "block";
+        clearTimeout(window.cartMessageTimer);
+        window.cartMessageTimer = setTimeout(function () {
+          messageBox.style.display = "none";
+        }, 2500);
+      }
+
+      return false;
+    }
+
+    return true;
+  }
+</script>
+
+</main>
+
+{% endblock content %}
