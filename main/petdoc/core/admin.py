@@ -4,7 +4,7 @@ from core.models import (
     Vendor, Category, Product,
     Cart, CartItem, Wishlist,
     Order, OrderItem, Review,
-    Address, PaymentMethod
+    Address, PaymentMethod, Appointment
 )
 
 
@@ -78,3 +78,9 @@ class PaymentMethodAdmin(admin.ModelAdmin):
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = ('user', 'title', 'city', 'country', 'is_default')
+
+@admin.register(Appointment)
+class AppointmentAdmin(admin.ModelAdmin):
+    list_display = ("email", "doctor", "created_at")
+    list_filter = ("doctor", "created_at")
+    search_fields = ("email",)    

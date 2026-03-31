@@ -1,0 +1,280 @@
+{% extends "partial/base.html" %}
+{% load static %}
+{% block content %}
+
+<main class="main">
+
+  <style>
+    .appointment-hero {
+      background: linear-gradient(135deg, #eef7ff 0%, #f4fff8 100%);
+      padding: 70px 0 55px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .appointment-badge {
+      display: inline-block;
+      background: #e9fff3;
+      color: #198754;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    .appointment-title {
+      font-size: 42px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .appointment-subtitle {
+      max-width: 760px;
+      margin: 0 auto;
+      color: #6b7280;
+      font-size: 17px;
+    }
+
+    .appointment-section {
+      padding: 70px 0;
+      background: #f8fafc;
+    }
+
+    .doctor-card {
+      background: #fff;
+      border-radius: 22px;
+      padding: 28px;
+      height: 100%;
+      border: 1px solid #edf1f5;
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.05);
+      transition: .3s ease;
+    }
+
+    .doctor-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.09);
+    }
+
+    .doctor-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #0d6efd, #198754);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 18px;
+    }
+
+    .doctor-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 6px;
+    }
+
+    .doctor-specialty {
+      color: #0d6efd;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 12px;
+    }
+
+    .doctor-details {
+      color: #6b7280;
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+      min-height: 92px;
+    }
+
+    .doctor-availability {
+      background: #f8f9fa;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 600;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .appointment-form-wrap {
+      margin-top: 60px;
+    }
+
+    .appointment-form-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 34px;
+      border: 1px solid #edf1f5;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
+    }
+
+    .form-title {
+      font-size: 30px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .form-subtitle {
+      color: #6b7280;
+      margin-bottom: 26px;
+    }
+
+    .appointment-input,
+    .appointment-select {
+      width: 100%;
+      border: 1px solid #dbe3ec;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 15px;
+      outline: none;
+      transition: .25s ease;
+      background: #fff;
+    }
+
+    .appointment-input:focus,
+    .appointment-select:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.08);
+    }
+
+    .submit-appointment-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg, #0d6efd, #198754);
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 15px 22px;
+      border-radius: 16px;
+      transition: .3s ease;
+    }
+
+    .submit-appointment-btn:hover {
+      transform: translateY(-2px);
+      opacity: .96;
+    }
+
+    .appointment-message {
+      max-width: 760px;
+      margin: 0 auto 24px;
+      border-radius: 16px;
+      padding: 16px 18px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    }
+
+    .appointment-message.success {
+      background: #eafaf1;
+      color: #146c43;
+      border: 1px solid #b7e4c7;
+    }
+
+    .appointment-message.error {
+      background: #fff1f2;
+      color: #b42318;
+      border: 1px solid #fecdd3;
+    }
+
+    @media (max-width: 767px) {
+      .appointment-title {
+        font-size: 30px;
+      }
+
+      .appointment-form-card {
+        padding: 24px;
+      }
+    }
+  </style>
+
+  <section class="appointment-hero">
+    <div class="container text-center">
+      <span class="appointment-badge">Pet Specialist Appointment</span>
+      <h1 class="appointment-title">Book a Veterinary Appointment for Your Pet</h1>
+      <p class="appointment-subtitle">
+        Choose your preferred specialist, review doctor availability, and submit your appointment request quickly and easily.
+      </p>
+    </div>
+  </section>
+
+  <section class="appointment-section">
+    <div class="container">
+
+
+      <div class="row g-4">
+        {% for doctor in doctors %}
+        <div class="col-lg-4 col-md-6">
+          <div class="doctor-card">
+            <div class="doctor-icon">
+              <i class="bi {{ doctor.icon }}"></i>
+            </div>
+            <h3 class="doctor-name">{{ doctor.name }}</h3>
+            <div class="doctor-specialty">{{ doctor.specialty }}</div>
+            <p class="doctor-details">{{ doctor.details }}</p>
+            <div class="doctor-availability">
+              <i class="bi bi-clock-history"></i>
+              <span>{{ doctor.time }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="appointment-form-wrap">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="appointment-form-card">
+              <h2 class="form-title">Send Appointment Request</h2>
+              <p class="form-subtitle">Enter your email and select the doctor you want to visit for your pet.</p>
+
+              <form method="post" action="{% url 'submit_appointment' %}">
+                {% csrf_token %}
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">Your Email</label>
+                    <input type="email" name="email" class="appointment-input" placeholder="Enter your email address" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">Select Doctor</label>
+                    <select name="doctor" class="appointment-select" required>
+                      <option value="">Choose a specialist</option>
+                      {% for doctor in doctors %}
+                        <option value="{{ doctor.value }}">{{ doctor.name }} - {{ doctor.specialty }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="col-12 mt-3">
+                    <button type="submit" class="submit-appointment-btn">
+                      <i class="bi bi-send-check"></i>
+                      Submit Appointment Request
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+{% endblock content %}

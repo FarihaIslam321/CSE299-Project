@@ -159,3 +159,20 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.user.username}"
+    
+
+class Appointment(models.Model):
+    DOCTOR_CHOICES = (
+        ("dr_sarah", "Dr. Sarah Ahmed - Pet Medicine Specialist"),
+        ("dr_rahim", "Dr. Rahim Chowdhury - Surgery Specialist"),
+        ("dr_nabila", "Dr. Nabila Islam - Skin & Allergy Specialist"),
+        ("dr_tanvir", "Dr. Tanvir Hossain - Bird & Exotic Pet Specialist"),
+        ("dr_farzana", "Dr. Farzana Kabir - Livestock Specialist"),
+    )
+
+    email = models.EmailField()
+    doctor = models.CharField(max_length=100, choices=DOCTOR_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.email} - {self.get_doctor_display()}"    

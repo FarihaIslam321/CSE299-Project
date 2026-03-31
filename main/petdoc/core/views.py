@@ -2,8 +2,9 @@ from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
+from django.views.decorators.http import require_POST
 from core.models import Product, Cart, CartItem, Wishlist
+from .models import Appointment 
 
 
 def home(request):
@@ -126,3 +127,63 @@ def toggle_wishlist(request, product_id):
         messages.success(request, f"{product.title} added to wishlist.")
 
     return redirect(request.META.get('HTTP_REFERER', 'shop_page'))
+
+
+def appoint_page(request):
+    doctors = [
+        {
+            "value": "dr_sarah",
+            "name": "Dr. Sarah Ahmed",
+            "specialty": "Pet Medicine Specialist",
+            "details": "Expert in general pet health, fever, infection, digestive problems, and preventive care for cats and dogs.",
+            "time": "Sat - Thu | 9:00 AM - 1:00 PM",
+            "icon": "bi-heart-pulse"
+        },
+        {
+            "value": "dr_rahim",
+            "name": "Dr. Rahim Chowdhury",
+            "specialty": "Veterinary Surgery Specialist",
+            "details": "Specialized in minor and major surgeries, wound management, fracture care, and emergency procedures.",
+            "time": "Sat - Wed | 3:00 PM - 8:00 PM",
+            "icon": "bi-bandaid"
+        },
+        {
+            "value": "dr_nabila",
+            "name": "Dr. Nabila Islam",
+            "specialty": "Skin & Allergy Specialist",
+            "details": "Treats pet skin disease, hair loss, itching, fungal infections, and allergy-related conditions.",
+            "time": "Sun - Thu | 10:00 AM - 2:00 PM",
+            "icon": "bi-shield-plus"
+        },
+        {
+            "value": "dr_tanvir",
+            "name": "Dr. Tanvir Hossain",
+            "specialty": "Bird & Exotic Pet Specialist",
+            "details": "Focused on birds, rabbits, and exotic pets with special care, nutrition, and disease evaluation.",
+            "time": "Mon - Thu | 4:00 PM - 7:00 PM",
+            "icon": "bi-feather"
+        },
+        {
+            "value": "dr_farzana",
+            "name": "Dr. Farzana Kabir",
+            "specialty": "Livestock Specialist",
+            "details": "Experienced in cattle, goat, sheep, and farm animal treatment, vaccination, and herd health support.",
+            "time": "Sat - Thu | 8:00 AM - 12:00 PM",
+            "icon": "bi-house-heart"
+        },
+    ]
+    return render(request, "appoint.html", {"doctors": doctors})
+
+
+@require_POST
+def submit_appointment(request):
+    email = request.POST.get("email")
+    doctor = request.POST.get("doctor")
+
+    if not email or not doctor:
+        messages.error(request, "Please provide your email and select a doctor.")
+        return redirect("appoint_page")
+
+    Appointment.objects.create(email=email, doctor=doctor)
+    messages.success(request, "Appointment request submitted successfully. Our team will contact you soon.")
+    return redirect("appoint_page")
