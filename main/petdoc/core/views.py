@@ -6,10 +6,32 @@ from django.views.decorators.http import require_POST
 from core.models import Product, Cart, CartItem, Wishlist
 from .models import Appointment 
 import os
-import torch
 from django.http import JsonResponse
 from django.conf import settings
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import io
+from PIL import Image
+
+
+# 1. Import the NEW SDK
+from google import genai
+from google.genai import types
+
+# 2. Configure the Client (Paste your actual API key here)
+client = genai.Client(api_key="AIzaSyC6ZhqhIK2MS-Repc9jW7PdxQ2KhZad5yY")
+
+# 3. Define the Professional AI Persona
+system_instruction = (
+    "You are an expert, empathetic virtual veterinarian assistant for the 'Smart Veterinary Care' platform. "
+    "If the user says a casual greeting, introduce yourself warmly. "
+    "If the user provides symptoms or an image of an animal, analyze it professionally. "
+    "Provide potential causes, care advice, and ALWAYS conclude by clearly stating whether "
+    "a physical vet visit is URGENT or if the owner should MONITOR the pet. "
+    "Format your answers using Markdown (bolding, bullet points) for easy reading. "
+    "Never prescribe exact medication dosages."
+)
+
+
 
 
 def home(request):
@@ -195,72 +217,48 @@ def submit_appointment(request):
 
 
 
-#For ML Model
 
 
-# 1. Define the path to your unzipped model folder
-MODEL_DIR = os.path.join(settings.BASE_DIR, 'professional_vet_ai')
 
-# 2. Load the Model and Tokenizer ONCE when the Django server starts
-try:
-    print("Loading Custom Vet AI Model...")
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_DIR)
-    model.eval() # Set model to 'evaluation' mode (turns off training features to save memory)
-    print("Custom Vet AI Model loaded successfully!")
-except Exception as e:
-    print(f"Error loading model: {e}")
-    tokenizer = None
-    model = None
 
 def custom_vet_assistant(request):
-    # Load the chat page on a normal visit
+    # Load the page
     if request.method == 'GET':
-        return render(request, 'ai_chat.html')
+        return render(request, 'ai_chat.html') # Adjust path if your template is elsewhere
 
-    # Handle the AJAX request from the user
+    # Handle the AI Request
     if request.method == 'POST':
         user_prompt = request.POST.get('prompt', '').strip()
         uploaded_image = request.FILES.get('image', None)
 
-        # Handle the case where the user uploads an image
-        # (Since we only trained a text model, we must politely decline images for now)
-        if uploaded_image:
-            return JsonResponse({
-                'status': 'success', 
-                'reply': "I received your image! However, my custom AI is currently only trained to read and analyze text symptoms. Please describe your pet's condition in words."
-            })
-
-        if not user_prompt:
-            return JsonResponse({'status': 'error', 'message': 'Please provide symptoms.'})
-
-        if not model or not tokenizer:
-            return JsonResponse({'status': 'error', 'message': 'AI model is currently offline. Check server logs.'})
+        if not user_prompt and not uploaded_image:
+            return JsonResponse({'status': 'error', 'message': 'Please provide text or an image.'})
 
         try:
-            # 1. Tokenize the input (Translate human words into AI numbers)
-            # max_length=128 ensures it doesn't crash if they write an essay
-            inputs = tokenizer(user_prompt, return_tensors="pt", truncation=True, padding=True, max_length=128)
-
-            # 2. Make the prediction!
-            # torch.no_grad() tells the CPU not to calculate gradients, making it run 10x faster
-            with torch.no_grad():
-                outputs = model(**inputs)
-                logits = outputs.logits
-                predicted_class_id = logits.argmax().item()
-
-            # 3. Interpret the result based on how we trained it (1 = Yes Dangerous, 0 = No)
-            if predicted_class_id == 1:
-                diagnosis = "⚠️ **URGENT:** Based on the symptoms described, this condition appears potentially DANGEROUS. Please seek physical veterinary care immediately."
-            else:
-                diagnosis = "✅ **MONITOR:** The symptoms do not immediately appear life-threatening, but please monitor your pet closely and consult a vet if they worsen."
-
-            # Add a little signature so you know it's working
-            reply = f"{diagnosis}\n\n*(Analysis powered by Custom Smart Vet Model)*"
+            prompt_parts = []
             
-            return JsonResponse({'status': 'success', 'reply': reply})
+            # Add text
+            if user_prompt:
+                prompt_parts.append(user_prompt)
+                
+            # Add image
+            if uploaded_image:
+                image_bytes = uploaded_image.read()
+                img = Image.open(io.BytesIO(image_bytes))
+                prompt_parts.append(img)
+
+            # Generate response using the NEW SDK and gemini-2.5-flash
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt_parts,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction
+                )
+            )
+            
+            return JsonResponse({'status': 'success', 'reply': response.text})
 
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f"Analysis error: {str(e)}"})
+            return JsonResponse({'status': 'error', 'message': f"AI Connection Error: {str(e)}"})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})

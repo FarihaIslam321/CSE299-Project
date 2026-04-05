@@ -1,0 +1,324 @@
+{% extends "partial/base.html" %}
+{% load static %}
+{% block content %}
+<style>
+    /* --- Modern Typography & Layout --- */
+    .ai-container {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #ffffff;
+        max-width: 900px;
+        margin: 20px auto;
+        height: 85vh;
+        display: flex;
+        flex-direction: column;
+        border-radius: 16px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eaeaea;
+        overflow: hidden;
+    }
+
+    .chat-header {
+        padding: 20px;
+        text-align: center;
+        background: #ffffff;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .chat-header h2 { margin: 0; font-size: 1.4rem; color: #1f1f1f; font-weight: 600; }
+    .chat-header p { margin: 5px 0 0 0; font-size: 0.9rem; color: #666; }
+
+    /* --- Chat History Area --- */
+    .chat-history {
+        flex-grow: 1;
+        padding: 30px 20px;
+        overflow-y: auto;
+        background-color: #f9fbfd;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        scroll-behavior: smooth;
+    }
+
+    .msg-row { display: flex; width: 100%; }
+    .msg-row.user { justify-content: flex-end; }
+    .msg-row.ai { justify-content: flex-start; }
+
+    .bubble {
+        max-width: 80%;
+        padding: 14px 20px;
+        font-size: 1rem;
+        line-height: 1.6;
+        word-wrap: break-word;
+    }
+
+    /* User Message Style (Sleek Gray) */
+    .bubble.user-bubble {
+        background: #f0f4f9;
+        color: #1f1f1f;
+        border-radius: 20px 20px 4px 20px;
+    }
+
+    /* AI Message Style (Clean White with Icon) */
+    .ai-wrapper { display: flex; gap: 12px; max-width: 85%; }
+    .ai-icon {
+        width: 35px; height: 35px;
+        background: #e3e8fc; color: #3b5998;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; flex-shrink: 0;
+    }
+    .bubble.ai-bubble {
+        background: transparent;
+        color: #1f1f1f;
+        padding: 0;
+        margin-top: 5px;
+    }
+
+    /* AI Markdown Formatting */
+    .ai-bubble strong { color: #000; }
+    .ai-bubble ul { margin: 10px 0; padding-left: 20px; }
+    .ai-bubble li { margin-bottom: 5px; }
+
+    /* --- Gemini-Style Input Area --- */
+    .input-container {
+        padding: 20px;
+        background: #ffffff;
+    }
+
+    .prompt-box {
+        display: flex;
+        align-items: flex-end;
+        background: #f0f4f9;
+        border-radius: 24px;
+        padding: 10px 15px;
+        gap: 10px;
+        transition: background 0.3s;
+    }
+    
+    .prompt-box:focus-within { background: #e9eef6; }
+
+    /* Image Attachment Button */
+    .attach-btn {
+        background: transparent; border: none; cursor: pointer;
+        padding: 10px; border-radius: 50%; display: flex;
+        align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .attach-btn:hover { background: #dfe4ea; }
+    .attach-btn svg { width: 22px; height: 22px; fill: #444746; }
+    .attach-btn.has-file svg { fill: #0b57d0; } /* Turns blue when image is attached */
+
+    /* Auto-expanding Textarea */
+    .prompt-box textarea {
+        flex-grow: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        resize: none;
+        font-size: 1rem;
+        font-family: inherit;
+        padding: 10px 0;
+        max-height: 150px;
+        min-height: 24px;
+        color: #1f1f1f;
+    }
+
+    /* Send Button */
+    .send-btn {
+        background: transparent; border: none; cursor: pointer;
+        padding: 10px; border-radius: 50%; display: flex;
+        align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .send-btn:hover { background: #dfe4ea; }
+    .send-btn svg { width: 22px; height: 22px; fill: #444746; }
+    .send-btn:disabled svg { fill: #c4c7c5; }
+
+    /* File Preview Label */
+    #file-name-display {
+        font-size: 0.8rem; color: #0b57d0; padding-left: 15px;
+        margin-bottom: 5px; display: none; font-weight: 500;
+    }
+
+    /* Loading Animation */
+    .loading-pulse { display: none; padding: 10px 0; font-size: 0.95rem; color: #666; font-style: italic; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+</style>
+
+<div class="ai-container">
+    <div class="chat-header">
+        <h2>Smart Vet Assistant</h2>
+        <p>AI-powered medical analysis for your pet</p>
+    </div>
+
+    <div class="chat-history" id="chat-box">
+        <div class="msg-row ai">
+            <div class="ai-wrapper">
+                <div class="ai-icon">🐾</div>
+                <div class="bubble ai-bubble">
+                    Hello! I am your AI Veterinary Assistant. How can I help your pet today?
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div id="file-name-display"></div>
+        
+        <form id="chat-form">
+            {% csrf_token %}
+            <div class="prompt-box">
+                <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                
+                <button type="button" class="attach-btn" id="attach-btn-ui" title="Upload Image">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
+                </button>
+                
+                <textarea id="user-input" rows="1" placeholder="Type a message..."></textarea>
+                
+                <button type="submit" id="send-button" class="send-btn" title="Send Message">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById('chat-form');
+        const inputField = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+        const sendButton = document.getElementById('send-button');
+        const imageUpload = document.getElementById('image-upload');
+        const attachBtnUI = document.getElementById('attach-btn-ui');
+        const fileNameDisplay = document.getElementById('file-name-display');
+
+        // 1. Auto-expand textarea like Gemini
+        inputField.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // 2. Handle Image Attachment UI
+        attachBtnUI.addEventListener('click', () => imageUpload.click());
+        
+        imageUpload.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                attachBtnUI.classList.add('has-file');
+                fileNameDisplay.textContent = `📎 Attached: ${this.files[0].name}`;
+                fileNameDisplay.style.display = 'block';
+            } else {
+                attachBtnUI.classList.remove('has-file');
+                fileNameDisplay.style.display = 'none';
+            }
+        });
+
+        // 3. Scroll helper
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // 4. Professional Markdown Parser (Bold, Bullets, Linebreaks)
+        function formatAIResponse(text) {
+            let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Bold
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>'); // Italic
+            
+            // Convert markdown bullets to HTML lists
+            html = html.replace(/^\* (.*$)/gim, '<li>$1</li>');
+            html = html.replace(/<li>(.*?)<\/li>/g, '<ul><li>$1</li></ul>');
+            html = html.replace(/<\/ul>\n<ul>/g, ''); // merge adjacent lists
+            
+            html = html.replace(/\n/g, '<br>'); // Line breaks
+            return html;
+        }
+
+        // 5. Submit Handler
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userText = inputField.value.trim();
+            const imageFile = imageUpload.files[0];
+            
+            if (!userText && !imageFile) return; 
+
+            // Add User message
+            let userContent = userText;
+            if (imageFile) userContent += `<br><small style="color:#0b57d0;">[Image attached: ${imageFile.name}]</small>`;
+            
+            const userMsgHTML = `<div class="msg-row user"><div class="bubble user-bubble">${userContent}</div></div>`;
+            chatBox.insertAdjacentHTML('beforeend', userMsgHTML);
+            
+            // Reset UI
+            inputField.value = '';
+            inputField.style.height = 'auto';
+            imageUpload.value = '';
+            attachBtnUI.classList.remove('has-file');
+            fileNameDisplay.style.display = 'none';
+            sendButton.disabled = true;
+            scrollToBottom();
+
+            // Add Loading State
+            const loadingId = 'loading-' + Date.now();
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div class="msg-row ai" id="${loadingId}">
+                    <div class="ai-wrapper">
+                        <div class="ai-icon">✨</div>
+                        <div class="bubble ai-bubble loading-pulse">Analyzing symptoms...</div>
+                    </div>
+                </div>
+            `);
+            scrollToBottom();
+
+            // Prepare Data
+            const formData = new FormData();
+            formData.append('prompt', userText);
+            if (imageFile) formData.append('image', imageFile);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            // Fetch from Django
+            try {
+                const response = await fetch("{% url 'ai_assistant' %}", { method: 'POST', body: formData });
+                const data = await response.json();
+                
+                document.getElementById(loadingId).remove(); // Remove loading state
+
+                let aiResponseHTML = '';
+                if (data.status === 'success') {
+                    aiResponseHTML = formatAIResponse(data.reply);
+                } else {
+                    aiResponseHTML = `<span style="color: red;">Error: ${data.message}</span>`;
+                }
+
+                // Add AI response
+                chatBox.insertAdjacentHTML('beforeend', `
+                    <div class="msg-row ai">
+                        <div class="ai-wrapper">
+                            <div class="ai-icon">🐾</div>
+                            <div class="bubble ai-bubble">${aiResponseHTML}</div>
+                        </div>
+                    </div>
+                `);
+
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatBox.insertAdjacentHTML('beforeend', `
+                    <div class="msg-row ai">
+                        <div class="ai-wrapper"><div class="ai-icon">⚠️</div>
+                        <div class="bubble ai-bubble" style="color: red;">System error. Cannot reach the server.</div></div>
+                    </div>
+                `);
+            } finally {
+                sendButton.disabled = false;
+                scrollToBottom();
+                inputField.focus();
+            }
+        });
+
+        // Enter to send (Shift+Enter for newline)
+        inputField.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+    });
+</script>
+{% endblock %}
